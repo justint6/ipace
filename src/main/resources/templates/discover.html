@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <title>Discover Devices</title>
+
+    <link rel="stylesheet" type="text/css" href="/webjars/datatables/1.10.12/css/jquery.dataTables.min.css"/>
+    <link rel="stylesheet" type="text/css" href="/webjars/datatables/1.10.12/css/dataTables.bootstrap.min.css"/>
+    <link rel='stylesheet' href='/webjars/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css'/>
+    <link rel="stylesheet" type="text/css" href="/webjars/bootstrap-select/1.7.3-1/css/bootstrap-select.min.css"/>
+    <link rel="stylesheet" type="text/css" href="/webjars/font-awesome/4.6.3/css/font-awesome.min.css"/>
+    <link href="/css/bootstrap-override.css" rel="stylesheet"/>
+
+</head>
+<body>
+<script src="/webjars/jquery/3.1.1/jquery.js"></script>
+<script src="/webjars/tether/1.3.7/dist/js/tether.min.js"></script>
+<script src="/webjars/bootstrap/4.0.0-alpha.6/js/bootstrap.min.js"></script>
+<script src="/webjars/bootstrap-select/1.7.3-1/js/bootstrap-select.min.js"></script>
+<script type="text/javascript" src="/webjars/datatables/1.10.12/js/jquery.dataTables.js"></script>
+
+<script type="text/javascript" src="/webjars/momentjs/2.14.1/min/moment.min.js"></script>
+
+<nav class="navbar navbar-fixed-top navbar-dark bg-inverse">
+
+    <a class="navbar-brand name" th:href="@{/}" href="/">BFEF Transformer ID Configuration Page</a>
+</nav>
+
+<div class="jumbotron paged">
+
+    Select Subnet & Subnet Mask to Scan.
+
+
+
+
+
+
+
+    <div class="row">
+
+        <div class="col-md-6">
+            <div class="input-group input-group-sm">
+                <div class="input-group-addon"><i class="fa fa-bolt" aria-hidden="true"></i> &nbsp; Subnet &nbsp; </div>
+                <input class="form-control" type="text" value=""
+                       id="subnet"
+                       aria-describedby="applicant-HelpBlock"
+                       data-toggle="popover"
+                       title="Multiple Job Numbers Possible"
+                       data-content='Use exact numbers; use a | to separate muliple numbers &ldquo;J-8213-g|J-8319-h&rdquo;'/>
+
+            </div>
+
+        </div>
+        <div class="col-md-6">
+            <div class="input-group input-group-sm">
+                <div class="input-group-addon"><i class="fa fa-random" aria-hidden="true"></i> &nbsp; Subnet Mask &nbsp; </div>
+                <input class="form-control" type="text" value=""
+                       id="mask"
+                       aria-describedby="applicant-HelpBlock"
+                       data-toggle="popover"
+                       title="Multiple Job Numbers Possible"
+                       data-content='Use exact numbers; use a | to separate muliple numbers &ldquo;J-8213-g|J-8319-h&rdquo;'/>
+
+            </div>
+
+        </div>
+    </div>
+    <div class="row my-row">
+        &nbsp;
+    </div>
+
+    <div class="col-md-4 top-buffer testmargin">
+        <button type="button" id="addButton" class="btn btn-sm btn-primary"> Discover </button>
+
+
+    </div>
+
+    <ul id=’console’ class=”list-group”>
+        <li id=’monitor1’ class=”list-group-item”></li>
+        <li id=’monitor2’ class=”list-group-item”></li>
+    </ul>
+
+
+    </div>
+
+
+
+
+<form id="chromefix" role="form">
+    <div class="row top-buffer">&nbsp; &nbsp;&nbsp;
+        <div class="col-md-12">
+
+            <table id="meterTable" class="table table-striped table-sm compact" cellpadding="0" cellspacing="0" border="0" width="100%">
+                <thead>
+                <tr>
+
+                    <th class="id">Identifier</th>
+                    <th class="deviceName">Device Name</th>
+                    <th class="dateScanned">Date Scanned</th>
+
+                </tr>
+                </thead>
+            </table>
+        </div>
+    </div>
+
+</form>
+
+
+
+<script th:inline="javascript">
+    //<![CDATA[
+    (function ($) {
+
+
+        /*[- http://stackoverflow.com/questions/24383805/datatables-change-number-of-pagination-buttons -]*/
+        $.fn.DataTable.ext.pager.numbers_length = 20;
+
+        /*[- https://datatables.net/manual/tech-notes/7 -]*/
+        $.fn.dataTable.ext.errMode = 'throw';
+
+     //   var testconcat2 = $('#voltageA').val() + " " + $('#voltageB').val();
+
+        /*$('#meterSelection').find('option').remove().end();
+        $.ajax({
+            //url: 'http://sbnswdv05:81/Devices',
+            url: 'http://localhost:7074/mappers',
+            async: false,
+            //dataSrc: '_embedded',
+            success: function(data, textStatus, request){
+                //window.alert(data._embedded.mappers[0].identifier);
+                $.each(data._embedded.mappers, function(key, val){
+                 //   window.alert(val.identifier);
+                    $('#meterSelection').append('<option>' + val.identifier + ", " + val.startDNP3 + '</option>');
+                });
+            },
+            error: function(request, textStatus, errorThrown){
+
+            },
+
+            complete: function(response, textStatus) {
+
+                //    return alert("Hey: " + textStatus);
+            }
+
+        });
+
+        $('#meterSelection').change(function (){
+            var selectedMeter = $('#meterSelection :selected').text();
+            var idOnlyindex = selectedMeter.indexOf(",");
+            var idOnly = selectedMeter.substring(0, idOnlyindex);
+
+            //window.alert(idOnly);
+
+            $('#meterAddress').val('http://sbnswdv05:81/dataInsts/' + idOnly);
+        });*/
+
+        $("#updateButton").click(function () {
+            //var stringParameters = '{ Va: ' + $('#voltageA').val() + ', Vb: ' + $('#voltageB').val() + ", Vc:" + $('#voltageA').val() + ", Ia:" + $('#currentA').val() + ", Ib:" + $('#currentB').val() + ", Ic:" + $('#currentC').val() + " }";
+            var stringParameters = "test123"
+
+            $.get("http://localhost:8080/ipaceDeviceEntities", stringParameters, function (data, status) {
+                /*$.get("http://127.0.0.1:7071/metrics/", {
+                 Va: 200.22,
+                 Vb: 240.11,
+                 Vc: 240.01,
+                 Ia: 10,
+                 Ib: 20,
+                 Ic: 20
+                 }, function (data, status) {
+
+                 http://sbnswdv05:81/Devices
+
+                 */
+                alert("Data: " + data + "\nStatus: " + status);
+            });
+
+        });
+
+        window.setInterval(function(){
+            $.get('http://127.0.0.1:8080/file.txt',
+                function(data){
+                    $('#mask').val(data);
+                }
+            );
+        },1000);
+
+        $("#addButton").click(function () {
+            //var stringParameters = '{ Va: ' + $('#voltageA').val() + ', Vb: ' + $('#voltageB').val() + ", Vc:" + $('#voltageA').val() + ", Ia:" + $('#currentA').val() + ", Ib:" + $('#currentB').val() + ", Ic:" + $('#currentC').val() + " }";
+            var stringParameters = 'Va=' + $('#voltageA').val() + '\u0026Vb=' + $('#voltageB').val() + "\u0026Vc=" + $('#voltageC').val() + "\u0026Ia=" + $('#currentA').val() + "\u0026Ib=" + $('#currentB').val() + "\u0026Ic=" + $('#currentC').val() + "\u0026commsoffset=" + $('#offset').val() + "\u0026rtunum=" + $('#rtunum').val();
+            var testconcat2 = $('#voltageA').val() + " " + $('#voltageB').val();
+           //window.alert (stringParameters);
+           // window.alert (testconcat2);
+            $.get("http://147.209.166.196:7071/metrics/", stringParameters, function (data, status) {
+            /*$.get("http://127.0.0.1:7071/metrics/", {
+                Va: 200.22,
+                Vb: 240.11,
+                Vc: 240.01,
+                Ia: 10,
+                Ib: 20,
+                Ic: 20
+            }, function (data, status) {
+
+             http://sbnswdv05:81/Devices
+
+            */
+                alert("Data: " + data + "\nStatus: " + status);
+            });
+        });
+
+        $("#pollButton").click(function () {
+            var pollAddressURL = $('#meterAddress').val();
+            $.ajax({
+                url: pollAddressURL,
+                dataSrc: 'measurements',
+                async: false,
+                success: function(data, textStatus, request){
+                    //window.alert(data.datainst.Values.Va);
+
+                        //window.alert(val.jobNumber)
+                       // window.alert(data.datainst.Values.Va);
+                        //window.alert(data.measurements[0].value);
+                        $('#voltageA').val(data.measurements[0].value);
+                    $('#voltageB').val(data.measurements[1].value);
+                    $('#voltageC').val(data.measurements[2].value);
+                    $('#currentA').val(data.measurements[3].value);
+                    $('#currentB').val(data.measurements[4].value);
+                    $('#currentC').val(data.measurements[5].value);
+
+                },
+                error: function(request, textStatus, errorThrown){
+
+                },
+
+                complete: function(response, textStatus) {
+
+                    //    return alert("Hey: " + textStatus);
+                }
+
+            });
+
+        })
+
+
+        var table = $('#meterTable').DataTable({
+            processing: false,
+            serverSide: false,
+            searching: false,
+            orderFixed: [0, 'desc'],
+            paging: false,
+            scrollCollapse: false,
+            lengthChange: false,
+            info: false,
+            scrollY: "60vh",
+            deferLoading: 0,
+            autoWidth: false,
+            rowId: 'serial',
+           dom:  '<"toolbar"><"top"i><"test"p>rt<"bottom"><"clear">',
+            pageLength: 20,
+            columnDefs: [
+                {
+                    targets: [ '_all' ], // if a number is specified here instead of all it will only apply to that column.
+                    visible: true,
+                    searchable: true
+                }
+            ],
+           ajax: {
+                /*[-
+                 don't use url key/value here: defer to the direct call to the onclick handler later
+                 (lets param handling be dealt with in a standardised way).
+                 -]*/
+                url: "http://127.0.0.1:8080/ipaceDevicesEntities",
+                async: true,
+                cache: false,
+                timeout: 4,
+                params: {
+                    start: 0, //start at first record in db
+                    limit: 100 //only return 100 results
+                },
+                dataSrc: '_embedded.ipaceDevicesEntities',
+
+                cache: false,
+                beforeSend: function (jqXHR, settings) {
+                    //searchWaitSpinner.show();
+                },
+
+                error: function(jqXHR, textStatus) {
+                    //searchWaitSpinner.hide();
+                },
+
+
+
+                complete: function(response, textStatus) {
+
+
+                }
+
+            },
+
+            //field widths of the below are updated in the crewalloc.css file.
+            columns: [
+                {data: "id", className: "id"},
+                {data: "deviceName", className: "deviceName"},
+                {data: "dateScanned", className: "dateScanned"}
+            ]
+        });
+
+        $('#meterTable tbody').on('click', 'tr', function(){
+            if ( $(this).hasClass('selected')) {
+                $(this).removeClass('selected');
+            } else {
+                table.$('tr.selected').removeClass('selected');
+                $(this).addClass('selected');
+                //window.alert(table.row('.selected').data().identifier);
+                $('#meterAddress').val('http://sbnswdv05:84/Datas/' + table.row('.selected').data().identifier.replace('252f', '%2f') + '?MeasurementIDs=1&MeasurementIDs=2&MeasurementIDs=3&MeasurementIDs=16&MeasurementIDs=17&MeasurementIDs=18');
+                $('#rtunum').val(table.row('.selected').data().rtu - 1);
+                $('#offset').val(table.row('.selected').data().startDNP3);
+                $('#meterSelection').val(table.row('.selected').data().identifier.replace('252f', '%2f'));
+                $('#voltageA').val(' ');
+                $('#voltageB').val(' ');
+                $('#voltageC').val(' ');
+                $('#currentA').val(' ');
+                $('#currentB').val(' ');
+                $('#currentC').val(' ');
+
+
+            }
+        });
+
+        $('#identifier').on('keyup', function(){
+            table.column(0).search( this.value, true).draw();
+        });
+
+        $('#rtu').on('keyup', function(){
+            table.column(2).search( this.value, true).draw();
+        });
+
+        $('#DNP3Addr').on('keyup', function(){
+            table.column(4).search( this.value, true).draw();
+        });
+
+        $('#midnum').on('keyup', function(){
+            table.column(1).search( this.value, true).draw();
+        });
+
+
+            table.draw();
+    })(jQuery);
+    // ]]>
+</script>
+</body>
+</html>

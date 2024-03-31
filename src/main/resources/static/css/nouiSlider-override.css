@@ -1,0 +1,46 @@
+.noUi-horizontal {
+    height: 16px;
+}
+
+.noUi-connect {
+    background: #025aa5;
+}
+
+.noUi-target {
+    border-radius: 0;
+}
+
+.noUi-horizontal .noUi-handle {
+    width: 24px;
+    height: 24px;
+    left: -12px;
+    top: -5px;
+}
+
+.noUi-handle:before,
+.noUi-handle:after {
+    content: "";
+    display: block;
+    position: absolute;
+    height: 12px;
+    width: 1px;
+    background: #E8E7E6;
+    left: 8px;
+    top: 5px;
+}
+
+.noUi-handle:after {
+    left: 12px;
+}
+
+.noUi-horizontal.noUi-extended {
+    padding-right: 21px;
+}
+
+.noUi-horizontal.noUi-extended .noUi-handle {
+    left: -1px;
+}
+
+.noUi-horizontal.noUi-extended .noUi-origin {
+    right: -32px;
+}

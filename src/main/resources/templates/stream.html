@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <title>IP Ace Device Discovery</title>
+
+    <link rel="stylesheet" type="text/css" href="/webjars/datatables/1.10.12/css/jquery.dataTables.min.css"/>
+    <link rel="stylesheet" type="text/css" href="/webjars/datatables/1.10.12/css/dataTables.bootstrap.min.css"/>
+    <link rel='stylesheet' href='/webjars/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css'/>
+    <link rel="stylesheet" type="text/css" href="/webjars/bootstrap-select/1.7.3-1/css/bootstrap-select.min.css"/>
+    <link rel="stylesheet" type="text/css" href="/webjars/font-awesome/4.6.3/css/font-awesome.min.css"/>
+    <link href="/noUiSlider.9.0.0/nouislider.css" rel="stylesheet"/>
+    <link href="/noUiSlider.9.0.0/nouislider.pips.css" rel="stylesheet"/>
+
+    <link href="/css/bootstrap-override.css" rel="stylesheet"/>
+    <link href="/css/nouiSlider-override.css" rel="stylesheet"/>
+
+
+</head>
+<body>
+<script src="/webjars/jquery/3.1.1/jquery.js"></script>
+<script src="/webjars/tether/1.3.7/dist/js/tether.min.js"></script>
+<script src="/webjars/bootstrap/4.0.0-alpha.6/js/bootstrap.min.js"></script>
+<script src="/webjars/bootstrap-select/1.7.3-1/js/bootstrap-select.min.js"></script>
+<script src="/noUiSlider.9.0.0/nouislider.min.js"></script>
+<script type="text/javascript" src="/webjars/datatables/1.10.12/js/jquery.dataTables.js"></script>
+
+<script type="text/javascript" src="/webjars/momentjs/2.14.1/min/moment.min.js"></script>
+
+
+<nav class="navbar navbar-fixed-top navbar-dark bg-inverse">
+
+    <a class="navbar-brand name" th:href="@{/}" href="/">IP Discovery Streaming</a>
+</nav>
+<div class="jumbotron stream">
+    <form id="searchParams" role="form">
+<div class="row" style="height: 56px;">
+    <div class="col-xs-3">
+        &nbsp;
+        <button type="button" id="filterButton" class="btn btn-sm btn-primary">Discovery</button>
+
+
+    </div>
+
+
+    <div class="col-xs-3">
+        <p class="pull-right form-text text-muted counters">
+            &nbsp;
+            Added: <span id="added">0</span>, Removed: <span id="removed">0</span>, Total: <span
+                id="total">0</span>
+            </p>
+            </div>
+
+          <div id="waitSpinner" style="display:none;" class="btn btn-sm">
+                &nbsp;
+              <img src="/img/ajax-loader.gif" height='16' width='16' alt="Loading..."/>
+         </div>
+
+        </div>
+    </form>
+</div>
+
+
+<form id="chromefix" role="form">
+    <div class="row top-buffer">&nbsp; &nbsp;&nbsp;
+        <div class="col-md-12">
+
+            <table id="meterTable" class="table table-striped table-sm compact" cellpadding="0" cellspacing="0" border="0" width="100%">
+                <thead>
+                <tr>
+                    <th class="id">Device Name</th>
+                    <th class="deviceID">Device Name</th>
+                    <th class="dateScanned">Date Scanned</th>
+
+                </tr>
+                </thead>
+            </table>
+        </div>
+    </div>
+
+</form>
+
+
+<!--/* Placed at the end of the document so the pages load faster */-->
+
+
+<script th:inline="javascript">
+    //<![CDATA[
+    (function ($) {
+
+        var table;
+
+        var filterButton = $('#filterButton');
+        var resetButton = $('#resetButton');
+        var waitSpinner = $('#waitSpinner');
+
+        var textlogTable = $('#textlogTable');
+        var statusInclude = $('#statusInclude');
+        var statusExclude = $('#statusExclude');
+        var subs = $('#subs');
+        var devices = $('#devices');
+        var categories = $('#categories');
+        var categoryLabels = categories.find('> label');
+
+        var added = $('#added');
+        var removed = $('#removed');
+        var total = $('#total');
+
+        var uf = $('#uf');
+        var rt = $('#rt');
+        var ufTime = $('#ufTime');
+        var rtTime = $('#rtTime');
+
+        /*[- use get(0) to get the actual DOM element, not the jQuery-wrapped one -]*/
+        var jsUf = uf.get(0);
+        var jsRt = rt.get(0);
+
+        $.ajax({
+            url:'http://127.0.0.1:8080/ClearStream/',
+            datasrc: 'content',
+            dataType: 'text',
+            success: function(data) {//var data2 = JSON.parse(data);
+                //window.alert('Here');
+
+
+
+            },
+
+        });
+
+
+        filterButton.on('click', function() { discoveryForm(); })
+
+        function discoveryForm(){
+
+            waitSpinner.fadeIn("slow");
+
+            $.ajax({
+                url:'http://127.0.0.1:8080/Discovery/',
+                datasrc: 'content',
+                dataType: 'text',
+                beforeSend: function (jqXHR, settings) {
+
+                },
+                success: function(data) {//var data2 = JSON.parse(data);
+                    //window.alert('Here');
+
+                    waitSpinner.fadeOut("slow");
+
+                },
+
+            });
+        }
+
+
+
+
+
+        function seconds(v) {
+            return Number(v) * 1000;
+        }
+
+        function minutes(v) {
+            return seconds(v) * 60;
+        }
+
+        var updateFrequency = seconds(1);
+        var retentionTime = minutes(2);
+
+        /*[- the current value in the database at time of rendering; ajax requests will be based off this value -]*/
+        var maxSerial = /*[[${maxSerial}]]*/ 0;
+
+        var extantAjaxTimeout;
+        extantAjaxTimeout = setTimeout(process, updateFrequency);
+        function process() {
+
+            var nowTime = new Date().getTime();
+
+            function rmOldRows() {
+                var cleanupTime = new Date(nowTime - retentionTime).getTime();
+
+                var rmCount = 0;
+                table.rows().every(function (rowIdx, tableLoop, rowLoop) {
+                    var data = this.data();
+
+                    if (data) {
+                        var rm = data.time_added <= cleanupTime;
+                        if (rm) {
+                            this.remove();
+                            rmCount++;
+                        }
+                    }
+                });
+                return rmCount;
+            }
+
+            /*[- http://stackoverflow.com/a/39703376 -]*/
+            function maxSerials(json) {
+                var serials = json.map(function (o) {
+                    return o.id;
+                });
+                return Math.max.apply(null, serials);
+            }
+
+            /*[- process each row separately so that can add a time_added attribute to each; used when cleaning up expired rows -]*/
+            function addNewrows(json) {
+                $.each(json, function (i, row) {
+                    row.time_added = nowTime;
+                    table.row.add(row);
+                });
+                return json.length;
+            }
+
+            var totalRemoved = rmOldRows();
+            var rowsAdded = 0;
+
+            //alert('Here');
+            if (maxSerial == null){
+                maxSerial = 0;
+            }
+            $.ajax({
+                url: "http://127.0.0.1:8080/deviceStreamEntities/search/findByIdGreaterThan?id=" + maxSerial + "&size=255",
+                //dataSrc: '_embedded.ipaceDevicesEntities',
+                //dataType: 'json',
+                async: true,
+                cache: false,
+                timeout: updateFrequency * 2,
+                dataFilter: function (data) {
+                    var json = jQuery.parseJSON(data);
+                    //window.alert(JSON.stringify(json.data[0].jobNumber));
+                    return JSON.stringify(json);
+                },
+                //dataSrc: function (json) {
+                //    alert(json.data);
+                 //   return json.data; // you need to return data array here
+               // },
+
+                error: function(xhr, status, error) {
+                    var err = eval("(" + xhr.responseText + ")");
+                   // alert('here 4' + xhr.responseText);
+                    var test = $.parseJSON(xhr.responseText);
+                    //var test2 = $.parseJSON(test);
+                   // alert("Test" + test);
+                  //  alert(status);
+                   // alert(error);
+                },
+
+                success: function (json, textStatus, jqXHR) {
+                    json.hasOwnProperty('_embedded');
+                   // alert('json oUT ' + json._embedded.ipaceDevicesEntities[0].id);
+                    //alert('json devicename ' + json._embedded.ipaceDevicesEntities[0].deviceName);
+                   // alert('here 3 ' + json);
+                    //data = json._embedded.ipaceDevicesEntities;
+                    if (json._embedded.deviceStreamEntities && (json._embedded.deviceStreamEntities.length > 0)) {
+
+                        var lastMaxSerial = maxSerial;
+                        var ms = maxSerials(json._embedded.deviceStreamEntities);
+                     //   alert('json ' + json._embedded.deviceStreamEntities[0].deviceName);
+                        /*[- seems like sometimes a duplicate query can be done; don't add duplicate data -]*/
+                        if  (ms !== lastMaxSerial) {
+                            rowsAdded = addNewrows(json._embedded.deviceStreamEntities);
+                            maxSerial = ms;
+                        }
+                        else
+                            rowsAdded = 0;
+                    }
+                },
+                complete: function (jqXHR, textStatus) {
+                    /*[- this section done regardless of success or not -]*/
+                    added.text(rowsAdded);
+                    removed.text(totalRemoved);
+                    total.text(table.rows().data().length);
+
+                    if ((rowsAdded > 0) || (totalRemoved > 0)){
+                        //table.clear();
+                        table.draw();
+
+                    }
+
+
+
+
+                    clearTimeout(extantAjaxTimeout);
+                    extantAjaxTimeout = setTimeout(process, updateFrequency);
+                }
+            });
+        } /*[- end process() -]*/
+
+        /*[- allow the form to be submitted by pressing the return key iff form is valid -]*/
+        $(subs).add(devices).add(statusInclude).add(statusExclude).on('keypress', function (event) {
+            if (event.which == 13)
+                filterButton.click();
+        });
+
+        $(subs).add(devices).add(statusInclude).add(statusExclude).popover({
+            placement: "bottom",
+            delay: {show: 1000, hide: 100},
+            trigger: 'hover'
+        });
+
+
+
+        var selectedRow = null;
+
+        table = $('#meterTable').DataTable({
+            processing: false,
+            serverSide: false,
+            searching: false,
+            orderFixed: [0, 'asc'],
+            paging: false,
+            scrollCollapse: false,
+            lengthChange: false,
+            info: false,
+            scrollY: "60vh",
+            deferLoading: 0,
+            autoWidth: false,
+            rowId: 'serial',
+
+            columns: [
+                {data: "id", className: "id"},
+                {data: "deviceId", className: "deviceId"},
+                {data: "dateScanned", className: "dateScanned"}
+            ],
+            drawCallback: function (settings) {
+                if (selectedRow) {
+                    selectedRow.get(0).scrollIntoView();
+                }
+            }
+        });
+
+
+        table.draw();
+    })(jQuery);
+    // ]]>
+</script>
+
+</body>
+</html>

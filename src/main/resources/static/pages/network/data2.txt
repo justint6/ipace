@@ -1,0 +1,452 @@
+
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+      <h1>
+        IP Discovery
+        <small>subnet scan</small>
+      </h1>
+      <ol class="breadcrumb">
+        <li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
+        <li><a href="#">Network</a></li>
+        <li class="active">IP Discovery</li>
+      </ol>
+    </section>
+
+    <!-- Main content -->
+    <section class="content">
+      <div class="row">
+      <div class="col-xs-6">
+
+<!-- general form elements -->
+                  <div class="box box-primary">
+                    <div class="box-header with-border">
+                      <h3 class="box-title">Subnet Details</h3>
+                    </div>
+                    <!-- /.box-header -->
+                    <!-- form start -->
+                    <form role="form">
+                      <div class="box-body">
+                        <div class="form-group">
+                          <label for="deviceName">Subnet</label>
+                          <input type="text" class="form-control" id="subnetDetails" placeholder="Enter Subnet Details">
+                        </div>
+                        <div class="form-group">
+                             <label for="ipAddress">Subnet Mask</label>
+                             <input type="text" class="form-control" id="updateIPAddress" placeholder="Subnet Mask">
+                        </div>
+                        <div class="form-group">
+                                                  <label for="deviceName">Scanned Count</label>
+                                                  <input type="text" class="form-control" id="scannedCount" placeholder="0">
+                        </div>
+
+                      </div>
+                      <!-- /.box-body -->
+
+                      <div class="box-footer">
+                        <a href="#myModal" role="button" class="btn btn-sm btn-primary" data-toggle="modal">Discovery</a>
+                        <button type="submit" class="btn btn-sm btn-primary">Current Subnet</button>
+                      </div>
+                    </form>
+                  </div>
+                  <!-- /.box -->
+
+
+
+         </div>
+        <div class="col-xs-6">
+
+          <!-- /.box -->
+
+          <div class="box">
+            <div class="box-header">
+              <h3 class="box-title">Data Table With Full Features</h3>
+              &nbsp;
+
+
+
+
+            </div>
+
+            <!-- /.box-header -->
+            <div class="box-body">
+              <table id="example1" class="table table-bordered table-striped">
+                <thead>
+
+                <tr>
+
+                  <th class="id">Identifier</th>
+                  <th class="deviceName">Device Name</th>
+                  <th class="dateScanned">Date Scanned</th>
+
+                </tr>
+                </thead>
+
+
+                <tfoot>
+                <tr>
+                  <th>Identifier</th>
+                  <th>Device Name</th>
+                  <th>Date Scanned</th>
+                </tr>
+                </tfoot>
+              </table>
+            </div>
+            <!-- /.box-body -->
+          </div>
+          <!-- /.box -->
+        </div>
+
+        <!-- /.col -->
+      </div>
+      <!-- /.row -->
+      <div id="dialog" title="Basic dialog">
+        <p>This is the default dialog which is useful for displaying information. The dialog window can be moved, resized and closed with the 'x' icon.</p>
+      </div>
+
+
+    </section>
+
+    <div class="container">
+      <a href="#myModal" role="button" class="btn btn-primary" data-toggle="modal">Submit</a>
+    </div>
+
+    <link href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet">
+
+    <!-- Modal -->
+    <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h4 class="modal-title" id="myModalLabel"><i class="fa fa-clock-o"></i> Please Wait</h4>
+          </div>
+          <div class="modal-body center-block">
+            <div id="dialogText">About to scan the subnet. Do you want to continue?</div>
+            <div class="progress">
+              <div class="progress-bar bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+
+              </div>
+            </div>
+            <button type="button" id="dialogButton" class="btn btn-sm btn-primary">Cancel</button>
+          <button type="button" id="doScan" class="btn btn-sm btn-primary">Scan</button>
+          </div>
+        </div><!-- /.modal-content -->
+      </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
+    <!-- /.content -->
+
+<!-- page script -->
+<script src="../../bower_components/jquery/dist/jquery.min.js"></script>
+<!-- Bootstrap 3.3.7 -->
+<script src="../../bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+<!-- DataTables -->
+<script src="../../bower_components/datatables.net/js/jquery.dataTables.min.js"></script>
+<script src="../../bower_components/datatables.net-bs/js/dataTables.bootstrap.min.js"></script>
+<!-- SlimScroll -->
+<script src="../../bower_components/jquery-slimscroll/jquery.slimscroll.min.js"></script>
+<script src="../../bower_components/bootstrap3-dialog/dist/js/bootstrap-dialog.js"></script>
+<script th:inline="javascript">
+    //<![CDATA[
+    (function ($) {
+
+        var table;
+
+
+        var resetButton = $('#resetButton');
+        var waitSpinner = $('#waitSpinner');
+
+        var textlogTable = $('#textlogTable');
+        var statusInclude = $('#statusInclude');
+        var statusExclude = $('#statusExclude');
+        var subs = $('#subs');
+        var devices = $('#devices');
+        var categories = $('#categories');
+        var categoryLabels = categories.find('> label');
+
+        var added = $('#added');
+        var removed = $('#removed');
+        var total = $('#total');
+
+        var uf = $('#uf');
+        var rt = $('#rt');
+        var ufTime = $('#ufTime');
+        var rtTime = $('#rtTime');
+
+        /*[- use get(0) to get the actual DOM element, not the jQuery-wrapped one -]*/
+        var jsUf = uf.get(0);
+        var jsRt = rt.get(0);
+
+        $('#scannedCount').val(0);
+
+
+        $.ajax({
+            url:'http://127.0.0.1:8080/ClearStream/',
+            datasrc: 'content',
+            dataType: 'text',
+            success: function(data) {//var data2 = JSON.parse(data);
+                //window.alert('Here');
+                $('#myModal').on('shown.bs.modal', function () {
+                            //discoveryForm();
+                            var progress = setInterval(function() {
+                            var $bar = $('.bar');
+                            $('#dialogButton').on('click', function() {
+                                                         //alert($('#subnetDetails').val());
+                                                         $('#myModal').modal('hide');
+                                                          })
+                            if ($bar.width() == 600) {
+
+                                // complete
+
+                                clearInterval(progress);
+                                $('.progress').removeClass('active');
+                                $('#myModal').modal('hide');
+                                $bar.width(0);
+
+                            } else {
+
+                                // perform processing logic here
+                                $bar.width(Math.round(($('#scannedCount').val()) * 2.38095));
+                                //$bar.width($bar.width()+50);
+                            }
+
+                            $bar.text(Math.round(($('#scannedCount').val()/252) * 100)  + "%");
+                        	}, 1000);
+
+
+                        })
+
+
+
+
+                        /* BootstrapDialog.show({
+                            message: 'Hi Apple!'
+                        });
+
+                        BootstrapDialog.show({
+                                    title: 'Default Title',
+                                    message: 'Click buttons below.',
+                                    buttons: [{
+                                        label: 'Message 1',
+                                        action: function(dialog) {
+                                            dialog.setMessage('Message 1');
+                                        }
+                                    }, {
+                                        label: 'Message 2',
+                                        action: function(dialog) {
+                                            dialog.setMessage('Message 2');
+                                        }
+                                    }]
+                                });*/
+
+                        $('#doScan').on('click', function() {
+                           // alert($('#subnetDetails').val());
+                           $('#dialogText').text("Scanning Subnet for Online IP Addresses");
+                            discoveryForm();
+                         })
+
+
+
+                        function discoveryForm(){
+
+
+
+                            $.ajax({
+                                url:"http://127.0.0.1:8080/Discovery?subnet=" + $('#subnetDetails').val() + "&mask=255.255.255.0",
+                                datasrc: 'content',
+                                dataType: 'text',
+                                beforeSend: function (jqXHR, settings) {
+
+                                },
+                                success: function(data) {var data2 = JSON.parse(data);
+                                   // alert("testing123")//$('#subnetDetails').val);
+
+
+                                },
+
+                            });
+                        }
+
+
+
+
+
+                        function seconds(v) {
+                            return Number(v) * 1000;
+                        }
+
+                        function minutes(v) {
+                            return seconds(v) * 60;
+                        }
+
+                        var updateFrequency = seconds(1);
+                        var retentionTime = minutes(2);
+
+                        /*[- the current value in the database at time of rendering; ajax requests will be based off this value -]*/
+                        var maxSerial = /*[[${maxSerial}]]*/ 0;
+
+                        var extantAjaxTimeout;
+                        extantAjaxTimeout = setTimeout(process, updateFrequency);
+                        function process() {
+
+                            var nowTime = new Date().getTime();
+
+                            function rmOldRows() {
+                                var cleanupTime = new Date(nowTime - retentionTime).getTime();
+
+                                var rmCount = 0;
+                                table.rows().every(function (rowIdx, tableLoop, rowLoop) {
+                                    var data = this.data();
+
+                                    if (data) {
+                                        var rm = data.time_added <= cleanupTime;
+                                        if (rm) {
+                                            this.remove();
+                                            rmCount++;
+                                        }
+                                    }
+                                });
+                                return rmCount;
+                            }
+
+                            /*[- http://stackoverflow.com/a/39703376 -]*/
+                            function maxSerials(json) {
+                                var serials = json.map(function (o) {
+                                    return o.id;
+                                });
+                                return Math.max.apply(null, serials);
+                            }
+
+                            /*[- process each row separately so that can add a time_added attribute to each; used when cleaning up expired rows -]*/
+                            function addNewrows(json) {
+                                $.each(json, function (i, row) {
+                                    row.time_added = nowTime;
+
+                                    if (json[i].displayFlag > 0) {
+                                        table.row.add(row);
+                                    }else{
+
+                                    }
+                                });
+                                return json.length;
+                            }
+
+                            var totalRemoved = rmOldRows();
+                            var rowsAdded = 0;
+
+                            //alert('Here');
+                            if (maxSerial == null){
+                                maxSerial = 0;
+                            }
+                            $.ajax({
+                                url: "http://127.0.0.1:8080/deviceStreamEntities/search/findByIdGreaterThan?id=" + maxSerial + "&size=255",
+
+                                async: true,
+                                cache: false,
+                                timeout: updateFrequency * 2,
+                                dataFilter: function (data) {
+                                    var json = jQuery.parseJSON(data);
+                                    //window.alert(JSON.stringify(json.data[0].jobNumber));
+                                    return JSON.stringify(json);
+                                },
+
+
+                                error: function(xhr, status, error) {
+                                    var err = eval("(" + xhr.responseText + ")");
+
+                                    var test = $.parseJSON(xhr.responseText);
+
+                                },
+
+                                success: function (json, textStatus, jqXHR) {
+                                    json.hasOwnProperty('_embedded');
+
+                                    if (json._embedded.deviceStreamEntities && (json._embedded.deviceStreamEntities.length > 0)) {
+
+                                        var lastMaxSerial = maxSerial;
+                                        var ms = maxSerials(json._embedded.deviceStreamEntities);
+
+                                        /*[- seems like sometimes a duplicate query can be done; don't add duplicate data -]*/
+                                        if  (ms !== lastMaxSerial) {
+                                            rowsAdded = addNewrows(json._embedded.deviceStreamEntities);
+                                            maxSerial = ms;
+                                            $('#scannedCount').val(maxSerial);
+                                        }
+                                        else
+                                            rowsAdded = 0;
+                                    }
+                                },
+                                complete: function (jqXHR, textStatus) {
+                                    /*[- this section done regardless of success or not -]*/
+                                    added.text(rowsAdded);
+                                    removed.text(totalRemoved);
+                                    total.text(table.rows().data().length);
+
+                                    if ((rowsAdded > 0) || (totalRemoved > 0)){
+                                    var $scrollBody = $(table.table().node()).parent();
+                                       $scrollBody.scrollTop($scrollBody.get(0).scrollHeight);
+                                        table.draw();
+
+                                    }
+
+
+
+
+                                    clearTimeout(extantAjaxTimeout);
+                                    extantAjaxTimeout = setTimeout(process, updateFrequency);
+                                }
+                            });
+                        } /*[- end process() -]*/
+
+                        /*[- allow the form to be submitted by pressing the return key iff form is valid -]*/
+
+
+                        $(subs).add(devices).add(statusInclude).add(statusExclude).popover({
+                            placement: "bottom",
+                            delay: {show: 1000, hide: 100},
+                            trigger: 'hover'
+                        });
+
+
+
+                        var selectedRow = null;
+
+                        table = $('#example1').DataTable({
+                            processing: false,
+                            serverSide: false,
+                            searching: false,
+                            orderFixed: [0, 'asc'],
+                            paging: false,
+                            scrollCollapse: false,
+                            lengthChange: false,
+                            info: false,
+                            scrollY: "60vh",
+                            deferLoading: 0,
+                            autoWidth: false,
+                            rowId: 'serial',
+                            scrollY: "600px",
+                              scroller: true,
+
+                            columns: [
+                                {data: "id", className: "id"},
+                                {data: "deviceId", className: "deviceId"},
+                                {data: "dateScanned", className: "dateScanned"}
+                            ],
+                            drawCallback: function (settings) {
+                                if (selectedRow) {
+                                    selectedRow.get(0).scrollIntoView();
+                                }
+                            }
+                        });
+
+
+                        table.draw();
+
+
+            },
+
+        });
+
+
+    })(jQuery);
+    // ]]>
+</script>
+

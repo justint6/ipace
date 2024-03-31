@@ -1,0 +1,279 @@
+
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+      <h1>
+        Devices
+        <small>Device Details</small>
+      </h1>
+      <ol class="breadcrumb">
+        <li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
+        <li><a href="#">Devices</a></li>
+        <li class="active">Device Details</li>
+      </ol>
+    </section>
+
+    <!-- Main content -->
+    <section class="content">
+      <div class="row">
+        <div class="col-md-12">
+           <a href="#myModal" id="addOS" role="button" class="btn btn-sm btn-primary" data-toggle="modal" action="add">Add New</a>
+          <a href="#myModal" id="editOS" role="button" class="btn btn-sm btn-primary" data-toggle="modal" action="edit">Edit</a>
+          <!-- /.box -->
+
+          <div class="box">
+            <div class="box-header">
+              <h3 class="box-title">Discovered Devices</h3>
+            </div>
+            <!-- /.box-header -->
+            <div class="box-body">
+              <table id="example1" class="table table-striped table-sm compact bg_white">
+                <thead>
+
+                <tr>
+
+                  <th class="id">Identifier</th>
+                  <th class="deviceName">Device Name</th>
+                  <th class="online">Online</th>
+                  <th class="dateScanned">Date Scanned</th>
+
+                </tr>
+                </thead>
+
+
+                <tfoot>
+                <tr>
+                  <th>Identifier</th>
+                  <th>Device Name</th>
+                  <th>Online</th>
+                  <th>Date Scanned</th>
+                </tr>
+                </tfoot>
+              </table>
+              <div class="box-footer">
+                 <button type="submit" id="onlineStatus" class="btn btn-primary">Online Status Check</button>
+              </div>
+            </div>
+            <!-- /.box-body -->
+          </div>
+          <!-- /.box -->
+        </div>
+        <!-- Modal -->
+                <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                  <div class="modal-dialog">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <h4 class="modal-title" id="myModalLabel"><i class="fa fa-clock-o"></i>&nbsp Device Details Update</h4>
+                      </div>
+                      <div class="modal-body center-block">
+                        <div id="dialogText"></div>
+
+
+                            <div class="box box-primary">
+
+                                                <!-- /.box-header -->
+                                                <!-- form start -->
+
+                                                <form id="ajaxForm" class="form-vertical" role="form" autocomplete="off" method="POST" action="/ajaxRequest/">
+                                                                        <fieldset>
+                                                                          <div class="form-group col-xs-12 col-sm-6">
+                                                                              <label for="deviceName" class="control-lable">Device Name</label>
+                                                                              <input type="text" class="form-control" name="deviceName" id="updateDeviceDetails" placeholder="Enter Device Name">
+                                                                          </div>
+                                                                          <div class="form-group col-xs-12 col-sm-6">
+                                                                             <label for="ipAddress" class="control-lable">IP Address</label>
+                                                                              <input type="text" class="form-control" name="ipAddress" id="updateIPAddress" placeholder="Enter IP Address">
+                                                                          </div>
+                                                                          <!--<div class="form-group col-xs-12 col-sm-6">
+                                                                              <label for="exampleInputEmail1" class="control-lable">Device OS</label>
+                                                                               <input type="email" class="form-control" name="updateOS" id="updateOS" placeholder="Enter OS">
+                                                                          </div>
+                                                                          <div class="form-group col-xs-12 col-sm-6">
+                                                                               <label for="exampleInputEmail1" class="control-lable">VLAN Details</label>
+                                                                               <input type="email" class="form-control" name="vlanDetails" id="vlanDetails" placeholder="Enter OS">
+                                                                          </div> -->
+                                                                          <div class="form-group col-xs-12 col-sm-12">
+                                                                               <label for="exampleInputEmail1" class="control-lable">Brief Description</label>
+                                                                                <textarea class="form-control" rows="5" name="description" id="updateDescription" placeholder="Enter Description"></textarea>
+                                                                          </div>
+
+
+                                                                          <br> </br>
+
+                                                                        </fieldset>
+                                                </form>
+                                                <!-- <form role="form">
+                                                  <div class="box-body">
+                                                    <div class="form-group">
+                                                      <label for="deviceName">Device Name</label>
+                                                      <input type="text" class="form-control" id="updateDeviceDetails" placeholder="Enter Device Name">
+                                                    </div>
+                                                    <div class="form-group">
+                                                         <label for="ipAddress">IP Address</label>
+                                                         <input type="text" class="form-control" id="updateIPAddress" placeholder="Enter IP Address">
+                                                    </div>
+                                                    <div class="form-group">
+                                                         <label for="exampleInputEmail1">Device OS</label>
+                                                         <input type="email" class="form-control" id="updateOS" placeholder="Enter OS">
+                                                    </div>
+                                                    <div class="form-group">
+                                                                                 <label for="exampleInputEmail1">VLAN Details</label>
+                                                                                 <input type="email" class="form-control" id="vlanDetails" placeholder="Enter OS">
+                                                                            </div>
+                                                    <div class="form-group">
+                                                          <label for="exampleInputEmail1">Brief Description</label>
+                                                       <textarea class="form-control" rows="5" id="updateDescription" placeholder="Enter Description"></textarea>
+                                                    </div>
+
+
+                                                  </div> -->
+                                                  <!-- /.box-body -->
+
+
+
+                                                <!-- </form> -->
+
+
+                                              </div>
+                                              <!-- /.box -->
+                                 <button type="button" id="dialogButton" class="btn btn-sm btn-primary">Cancel</button>
+                                 <button type="button" id="sendPlainJSon" class="btn btn-sm btn-primary">Submit</button>
+
+                      </div>
+                    </div><!-- /.modal-content -->
+                  </div><!-- /.modal-dialog -->
+                </div><!-- /.modal -->
+
+
+        <!-- /.col -->
+      </div>
+      <!-- /.row -->
+    </section>
+    <!-- /.content -->
+
+
+
+
+<!-- jQuery 3 -->
+<script src="../../bower_components/jquery/dist/jquery.min.js"></script>
+<!-- Bootstrap 3.3.7 -->
+<script src="../../bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+<!-- DataTables -->
+<script src="../../bower_components/datatables.net/js/jquery.dataTables.min.js"></script>
+<script src="../../bower_components/datatables.net-bs/js/dataTables.bootstrap.min.js"></script>
+<!-- SlimScroll -->
+<script src="../../bower_components/jquery-slimscroll/jquery.slimscroll.min.js"></script>
+<script src="/pages/device/json-format.js"></script>
+<script src="/pages/device/jquery-form-serializer.js"></script>
+
+<!-- FastClick -->
+<!-- page script -->
+<script>
+  $(function () {
+
+      $.fn.DataTable.ext.pager.numbers_length = 10;
+
+      /*[- https://datatables.net/manual/tech-notes/7 -]*/
+      $.fn.dataTable.ext.errMode = 'throw';
+
+ $("#data").addClass("active");
+      $("#devices").addClass("treeview active");
+
+
+      var table = $('#example1').DataTable({
+          processing: false,
+                                      serverSide: false,
+                                      searching: false,
+                                      orderFixed: [0, 'asc'],
+                                      paging: false,
+                                      scrollCollapse: false,
+                                      lengthChange: false,
+                                      info: false,
+                                      scrollY: "60vh",
+                                      deferLoading: 0,
+                                      autoWidth: false,
+                                      rowId: 'serial',
+                                      scrollY: "600px",
+                                        scroller: true,
+          select: true,
+          pageLength: 10,
+          columnDefs: [
+              {
+                  targets: [ '_all' ], // if a number is specified here instead of all it will only apply to that column.
+                  visible: true,
+                  searchable: true
+              }
+          ],
+          ajax: {
+              /*[-
+               don't use url key/value here: defer to the direct call to the onclick handler later
+               (lets param handling be dealt with in a standardised way).
+               -]*/
+              url: "http://127.0.0.1:8080/ipaceDevicesEntities?size=20000",
+              params: {
+                  start: 0, //start at first record in db
+                  limit: 100 //only return 100 results
+              },
+              dataSrc: '_embedded.ipaceDevicesEntities',
+
+              cache: false,
+              beforeSend: function (jqXHR, settings) {
+                  //searchWaitSpinner.show();
+              },
+
+              error: function(jqXHR, textStatus) {
+                  //searchWaitSpinner.hide();
+              },
+
+
+
+              complete: function(response, textStatus) {
+
+
+              }
+
+          },
+
+          //field widths of the below are updated in the crewalloc.css file.
+          columns: [
+              {data: "id", className: "id"},
+              {data: "deviceName", className: "deviceName"},
+              {data: "online", className: "online"},
+              {data: "dateScanned", className: "dateScanned"}
+          ]
+      });
+
+        $('#example1 tbody').on('click', 'tr', function(){
+            if ( $(this).hasClass('selected')) {
+                $(this).removeClass('selected');
+            } else {
+                table.$('tr.selected').removeClass('selected');
+                $(this).addClass('selected');
+                $("#updateDeviceDetails").val(table.row('.selected').data().deviceName);
+                $("#updateIPAddress").val(table.row('.selected').data().deviceName);
+
+            }
+        });
+
+
+
+
+
+ $("#onlineStatus").click(function(){
+             $.ajax({url: "http://127.0.0.1:8080/Online/", success: function(result){
+               table.destroy();
+                           table.draw();
+                    alert("Online Check");
+             }});
+});
+
+    table.draw();
+    $('#dialogButton').on('click', function() {
+
+          $('#myModal').modal('hide');
+          location.reload();
+      })
+
+  })
+</script>
+</body>
+</html>

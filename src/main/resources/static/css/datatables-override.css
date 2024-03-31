@@ -1,0 +1,14 @@
+#textlogTable_wrapper > div.dataTables_scroll > div.dataTables_scrollHead > div > table > thead > tr > th {
+    border-top: 0;
+    padding-top: 0;
+    /* don't do: padding-left: 0;*/
+}
+
+#textlogTable_wrapper {
+    margin-left: 0.5rem;
+    margin-right: 0.5rem;
+}
+
+.table.dataTable > tbody > tr > td {
+    line-height: 1.2rem !important;
+}

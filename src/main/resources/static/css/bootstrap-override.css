@@ -1,0 +1,9 @@
+.jumbotron.stream {
+    padding: 1rem 1rem 0.2rem 1rem;
+    margin-bottom: 0;
+}
+
+.jumbotron.paged {
+    padding: 1rem 1rem 0.6rem 1rem;
+    margin-bottom: 0;
+}
