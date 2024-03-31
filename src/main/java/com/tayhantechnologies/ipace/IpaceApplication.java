@@ -3,14 +3,14 @@ package com.tayhantechnologies.ipace;
 
 import com.tayhantechnologies.ipace.Entities.DevicePortsEntity;
 import com.tayhantechnologies.ipace.Entities.ExternalCommands;
-import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
-import org.eclipse.paho.client.mqttv3.MqttClient;
-import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
-import org.eclipse.paho.client.mqttv3.MqttException;
+//import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
+//import org.eclipse.paho.client.mqttv3.MqttClient;
+//import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
+//import org.eclipse.paho.client.mqttv3.MqttException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import sun.misc.OSEnvironment;
+//import sun.misc.OSEnvironment;
 import com.tayhantechnologies.ipace.Entities.OsEntity;
 
 import java.io.IOException;
